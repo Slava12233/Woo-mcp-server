@@ -1,0 +1,21 @@
+{
+  "name": "woocommerce-mcp-server",
+  "version": "1.0.0",
+  "description": "WooCommerce MCP Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "python -m src.woocommerce_mcp.server",
+    "test": "python -m pytest tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Slava12233/Woo-mcp-server.git"
+  },
+  "keywords": [
+    "woocommerce",
+    "mcp",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT"
+} 
