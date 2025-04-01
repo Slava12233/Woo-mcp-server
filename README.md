@@ -37,6 +37,39 @@ pip install -r requirements.txt
 # שלב 3: הגדר משתני סביבה (ראה הסבר בהמשך)
 ```
 
+## ☁️ פריסה ב-Railway
+
+השרת מוכן לפריסה מיידית בפלטפורמת [Railway](https://railway.app):
+
+```bash
+# שלב 1: שכפל את הרפוזיטורי לחשבון GitHub שלך
+
+# שלב 2: היכנס ל-Railway והתחבר עם חשבון GitHub
+# https://railway.app/
+
+# שלב 3: לחץ על "New Project" ובחר "Deploy from GitHub repo"
+
+# שלב 4: בחר את הרפוזיטורי המשוכפל
+
+# שלב 5: הגדר את משתני הסביבה הבאים:
+# - WORDPRESS_SITE_URL
+# - WOOCOMMERCE_CONSUMER_KEY
+# - WOOCOMMERCE_CONSUMER_SECRET
+# - WORDPRESS_USERNAME (אופציונלי)
+# - WORDPRESS_PASSWORD (אופציונלי)
+# - MCP_HOST=0.0.0.0
+# - MCP_PORT=8000
+
+# שלב 6: המתן לסיום הבנייה והפריסה
+```
+
+### יתרונות פריסה ב-Railway:
+- 🔄 פריסה אוטומטית מ-GitHub
+- 🔒 SSL אוטומטי
+- 📊 ניטור ולוגים מובנים
+- 🔍 דומיין חינמי מובנה (תת-דומיין של railway.app)
+- ⚡ סקיילינג אוטומטי לפי הצורך
+
 ## ⚙️ קונפיגורציה
 
 יש ליצור קובץ `.env` בתיקיית הבסיס של הפרויקט עם הפרטים הבאים:
@@ -486,6 +519,39 @@ pip install -r requirements.txt
 
 # Step 3: Configure environment variables (see below)
 ```
+
+## ☁️ Deployment on Railway
+
+The server is ready for immediate deployment on the [Railway](https://railway.app) platform:
+
+```bash
+# Step 1: Clone the repository to your GitHub account
+
+# Step 2: Log in to Railway and connect with your GitHub account
+# https://railway.app/
+
+# Step 3: Click on "New Project" and select "Deploy from GitHub repo"
+
+# Step 4: Select the cloned repository
+
+# Step 5: Configure the following environment variables:
+# - WORDPRESS_SITE_URL
+# - WOOCOMMERCE_CONSUMER_KEY
+# - WOOCOMMERCE_CONSUMER_SECRET
+# - WORDPRESS_USERNAME (optional)
+# - WORDPRESS_PASSWORD (optional)
+# - MCP_HOST=0.0.0.0
+# - MCP_PORT=8000
+
+# Step 6: Wait for the build and deployment to complete
+```
+
+### Benefits of Deployment on Railway:
+- 🔄 Automatic deployment from GitHub
+- 🔒 Automatic SSL
+- 📊 Built-in monitoring and logging
+- 🔍 Free subdomain on railway.app
+- ⚡ Automatic scaling based on demand
 
 ## ⚙️ Configuration
 

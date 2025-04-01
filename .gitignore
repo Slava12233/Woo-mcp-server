@@ -31,9 +31,13 @@ htmlcov/
 # Project specific
 *.log
 .env.*
+!.env.example
 *.sqlite
 *.sqlite3
 
 # Temporary files
 tmp/
-temp/ 
+temp/
+
+# Planning documents
+docs/ 

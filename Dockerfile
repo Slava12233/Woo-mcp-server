@@ -1,0 +1,19 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# התקנת תלויות
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# העתקת קוד המקור
+COPY . .
+
+# התקנת החבילה במצב פיתוח
+RUN pip install -e .
+
+# חשיפת פורט (פורט ברירת המחדל של MCP הוא 8000)
+EXPOSE 8000
+
+# הרצת השרת
+CMD ["python", "-m", "src.woocommerce_mcp.server"] 
