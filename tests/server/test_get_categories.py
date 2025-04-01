@@ -13,7 +13,8 @@ sys.path.insert(0, os.path.abspath("src"))
 # טעינת משתני סביבה מקובץ .env
 load_dotenv()
 
-from woocommerce_mcp.product_categories import get_product_categories
+# במקום לייבא את get_product_categories ישירות, אנחנו משתמשים ב-mcp
+from woocommerce_mcp.server import initialize
 
 
 async def main():
@@ -21,8 +22,11 @@ async def main():
     print("מקבל רשימת קטגוריות מוצרים מהחנות...")
     
     try:
-        # קבלת רשימת הקטגוריות
-        categories = await get_product_categories({"per_page": 50})
+        # אתחול ה-MCP
+        mcp = initialize()
+        
+        # קבלת רשימת הקטגוריות באמצעות ה-MCP client
+        categories = await mcp.get_product_categories(per_page=50)
         
         if categories:
             print(f"\nנמצאו {len(categories)} קטגוריות:")
