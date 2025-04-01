@@ -116,8 +116,28 @@ def initialize():
     @api.post("/mcp")
     async def mcp_endpoint(request: Request):
         """נקודת הקצה של פרוטוקול MCP."""
-        logger.info("MCP endpoint called")
-        return await mcp.handle_request(request)
+        logger.info(f"MCP endpoint called with method: {request.method}")
+        
+        try:
+            # לוג של headers כדי לראות מה נשלח
+            headers_log = dict(request.headers)
+            # הסרת פרטים רגישים מהלוג
+            if 'authorization' in headers_log:
+                headers_log['authorization'] = '[REDACTED]'
+            if 'cookie' in headers_log:
+                headers_log['cookie'] = '[REDACTED]'
+                
+            logger.info(f"Request headers: {headers_log}")
+            
+            # קריאה לטיפול בבקשה
+            response = await mcp.handle_request(request)
+            logger.info(f"MCP response type: {type(response)}")
+            return response
+        except Exception as e:
+            logger.error(f"Error in MCP endpoint: {e}")
+            logger.error(f"Error details: {traceback.format_exc()}")
+            # החזרת שגיאה בפורמט מתאים
+            return {"error": str(e)}, 500
     
     # הוספת middleware לרישום כל הבקשות
     @api.middleware("http")
