@@ -4,7 +4,7 @@ WooCommerce MCP Server - הנקודה הראשית של השרת
 """
 
 import os
-import uvicorn
+import sys
 from dotenv import load_dotenv
 
 # טעינת משתני סביבה מקובץ .env
@@ -72,14 +72,18 @@ def initialize():
 
 def main():
     """הפונקציה הראשית המפעילה את שרת ה-MCP."""
-    # אתחול כל הכלים
-    app = initialize()
-    
-    # קבלת אפליקציית FastAPI מתוך ה-MCP
-    fastapi_app = app.app
-    
-    # הפעלת השרת באמצעות uvicorn ישירות
-    uvicorn.run(fastapi_app, host=MCP_HOST, port=MCP_PORT)
+    try:
+        # אתחול כל הכלים
+        app = initialize()
+        
+        # הפעלת השרת באמצעות השיטה המובנית
+        # שינוי פרמטרים דרך משתני סביבה
+        os.environ["MCP_HOST"] = MCP_HOST
+        os.environ["MCP_PORT"] = str(MCP_PORT)
+        app.run()
+    except Exception as e:
+        print(f"Error starting server: {e}", file=sys.stderr)
+        raise
 
 if __name__ == "__main__":
     main() 
