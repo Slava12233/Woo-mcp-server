@@ -4,7 +4,7 @@ WooCommerce MCP Server - הנקודה הראשית של השרת
 """
 
 import os
-import asyncio
+import uvicorn
 from dotenv import load_dotenv
 
 # טעינת משתני סביבה מקובץ .env
@@ -18,6 +18,10 @@ DEFAULT_USERNAME = os.environ.get("WORDPRESS_USERNAME", "")
 DEFAULT_PASSWORD = os.environ.get("WORDPRESS_PASSWORD", "")
 DEFAULT_CONSUMER_KEY = os.environ.get("WOOCOMMERCE_CONSUMER_KEY", "")
 DEFAULT_CONSUMER_SECRET = os.environ.get("WOOCOMMERCE_CONSUMER_SECRET", "")
+
+# הגדרות שרת
+MCP_HOST = os.environ.get("MCP_HOST", "0.0.0.0")
+MCP_PORT = int(os.environ.get("MCP_PORT", "8000"))
 
 # ייצור שרת MCP
 mcp = FastMCP("WooCommerce MCP Server")
@@ -66,13 +70,16 @@ def initialize():
     
     return mcp
 
-async def main() -> None:
+def main():
     """הפונקציה הראשית המפעילה את שרת ה-MCP."""
     # אתחול כל הכלים
     app = initialize()
     
-    # הפעלת השרת
-    app.run()
+    # קבלת אפליקציית FastAPI מתוך ה-MCP
+    fastapi_app = app.app
+    
+    # הפעלת השרת באמצעות uvicorn ישירות
+    uvicorn.run(fastapi_app, host=MCP_HOST, port=MCP_PORT)
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    main() 
