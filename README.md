@@ -1,23 +1,31 @@
-# WooCommerce MCP Server (Python)
+# 🛒 WooCommerce MCP Server | Python Edition
 
-A Model Context Protocol (MCP) server for WooCommerce integration, compatible with Windows, macOS, and Linux.
+> *פתרון פשוט ויעיל לחיבור חנויות WooCommerce עם Model Context Protocol*
 
-## Overview
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Python](https://img.shields.io/badge/python-3.9%2B-yellow)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-This MCP server enables interaction with WooCommerce stores through the WordPress REST API. It provides comprehensive tools for managing all aspects of products, orders, customers, shipping, taxes, discounts, and store configuration.
+## 📌 מה זה?
 
-## Installation
+שרת Model Context Protocol (MCP) המאפשר אינטגרציה מלאה עם חנויות WooCommerce באמצעות ה-WordPress REST API. הספרייה מספקת כלים מקיפים לניהול כל היבטי המוצרים, הזמנות, לקוחות, משלוח, מיסים, הנחות וקונפיגורציית החנות.
 
-1. Clone the repository
-2. Install dependencies:
+## 🚀 התקנה מהירה
+
 ```bash
+# שלב 1: שכפל את הרפוזיטורי
+git clone https://github.com/yourusername/woocommerce-mcp-server.git
+cd woocommerce-mcp-server
+
+# שלב 2: התקן תלויות
 pip install -r requirements.txt
+
+# שלב 3: הגדר משתני סביבה (ראה הסבר בהמשך)
 ```
-3. Set up environment variables or create `.env` file (see Configuration)
 
-## Configuration
+## ⚙️ קונפיגורציה
 
-Create a `.env` file in the project root with your credentials:
+יש ליצור קובץ `.env` בתיקיית הבסיס של הפרויקט עם הפרטים הבאים:
 
 ```
 WORDPRESS_SITE_URL=https://your-wordpress-site.com
@@ -27,34 +35,33 @@ WORDPRESS_USERNAME=your-wordpress-username
 WORDPRESS_PASSWORD=your-wordpress-password
 ```
 
-### Environment Variables
+### משתני סביבה
 
-#### Required for WooCommerce API access:
-- `WORDPRESS_SITE_URL`: Your WordPress site URL (WooCommerce is a WordPress plugin)
-- `WOOCOMMERCE_CONSUMER_KEY`: WooCommerce REST API consumer key
-- `WOOCOMMERCE_CONSUMER_SECRET`: WooCommerce REST API consumer secret
+| משתנה | תיאור | נדרש |
+|--------|-------------|:-----:|
+| `WORDPRESS_SITE_URL` | כתובת האתר שלך (WooCommerce הוא פלאגין של WordPress) | ✅ |
+| `WOOCOMMERCE_CONSUMER_KEY` | מפתח צרכן WooCommerce REST API | ✅ |
+| `WOOCOMMERCE_CONSUMER_SECRET` | סוד צרכן WooCommerce REST API | ✅ |
+| `WORDPRESS_USERNAME` | שם משתמש WordPress עם הרשאות מתאימות | ⚠️ * |
+| `WORDPRESS_PASSWORD` | סיסמת WordPress לאימות | ⚠️ * |
 
-#### Required only for WordPress API methods:
-- `WORDPRESS_USERNAME`: WordPress username with appropriate permissions
-- `WORDPRESS_PASSWORD`: WordPress password for authentication
+\* נדרש רק עבור שיטות WordPress API
 
-You can also provide these credentials directly in the function calls if you prefer not to use environment variables.
+## 🔐 אפשרויות אימות
 
-## Authentication Options
+### אימות WooCommerce
+גישה ל-API של WooCommerce דורשת מפתחות צרכן שניתן ליצור בלוח הבקרה של WordPress תחת WooCommerce → הגדרות → מתקדם → REST API.
 
-### WooCommerce Authentication
-WooCommerce API access requires consumer keys that you can generate in your WordPress dashboard under WooCommerce → Settings → Advanced → REST API.
+### אימות WordPress
+עבור שיטות ספציפיות ל-WordPress (כמו ניהול פוסטים), יש לספק:
+- אישורי שם משתמש/סיסמה לאימות בסיסי
+- ה-REST API של WordPress חייב להיות מופעל באתר שלך
 
-### WordPress Authentication
-For WordPress-specific methods (like managing posts), you need to provide:
-- Username/password credentials for basic authentication
-- The WordPress REST API must be enabled on your site
+## 🔄 שיטות API
 
-## API Methods
+השרת תומך בשיטות API של WordPress ו-WooCommerce. להלן רשימת השיטות הזמינות מקובצות לפי קטגוריה:
 
-The server supports both WordPress and WooCommerce API methods. Here's a list of available methods grouped by category:
-
-### WordPress Content Management
+### ניהול תוכן WordPress
 
 These methods require WordPress username/password credentials and are independent of the WooCommerce API.
 
@@ -68,7 +75,7 @@ These methods require WordPress username/password credentials and are independen
 | `create_post_meta` | Create post metadata |
 | `delete_post_meta` | Delete post metadata |
 
-### WooCommerce Products
+### מוצרי WooCommerce
 
 | Method | Description |
 |--------|-------------|
@@ -82,7 +89,7 @@ These methods require WordPress username/password credentials and are independen
 | `update_product_meta` | Update product metadata (alias for create) |
 | `delete_product_meta` | Delete product metadata |
 
-### Product Categories
+### קטגוריות מוצרים
 
 | Method | Description |
 |--------|-------------|
@@ -92,7 +99,7 @@ These methods require WordPress username/password credentials and are independen
 | `update_product_category` | Update a product category |
 | `delete_product_category` | Delete a product category |
 
-### Product Tags
+### תגיות מוצרים
 
 | Method | Description |
 |--------|-------------|
@@ -102,7 +109,7 @@ These methods require WordPress username/password credentials and are independen
 | `update_product_tag` | Update a product tag |
 | `delete_product_tag` | Delete a product tag |
 
-### Product Attributes
+### מאפייני מוצרים
 
 | Method | Description |
 |--------|-------------|
@@ -117,7 +124,7 @@ These methods require WordPress username/password credentials and are independen
 | `update_attribute_term` | Update an attribute term |
 | `delete_attribute_term` | Delete an attribute term |
 
-### Product Variations
+### וריאציות מוצרים
 
 | Method | Description |
 |--------|-------------|
@@ -128,7 +135,7 @@ These methods require WordPress username/password credentials and are independen
 | `delete_product_variation` | Delete a product variation |
 | `batch_update_product_variations` | Batch update product variations |
 
-### Product Reviews
+### ביקורות מוצרים
 
 | Method | Description |
 |--------|-------------|
@@ -138,7 +145,7 @@ These methods require WordPress username/password credentials and are independen
 | `update_product_review` | Update a product review |
 | `delete_product_review` | Delete a product review |
 
-### WooCommerce Orders
+### הזמנות WooCommerce
 
 | Method | Description |
 |--------|-------------|
@@ -152,7 +159,7 @@ These methods require WordPress username/password credentials and are independen
 | `update_order_meta` | Update order metadata (alias for create) |
 | `delete_order_meta` | Delete order metadata |
 
-### Order Notes
+### הערות הזמנה
 
 | Method | Description |
 |--------|-------------|
@@ -161,7 +168,7 @@ These methods require WordPress username/password credentials and are independen
 | `create_order_note` | Create a new order note |
 | `delete_order_note` | Delete an order note |
 
-### Order Refunds
+### החזרי הזמנות
 
 | Method | Description |
 |--------|-------------|
@@ -171,7 +178,7 @@ These methods require WordPress username/password credentials and are independen
 | `update_order_refund` | Update an order refund |
 | `delete_order_refund` | Delete an order refund |
 
-### WooCommerce Customers
+### לקוחות WooCommerce
 
 | Method | Description |
 |--------|-------------|
@@ -185,7 +192,7 @@ These methods require WordPress username/password credentials and are independen
 | `update_customer_meta` | Update customer metadata (alias for create) |
 | `delete_customer_meta` | Delete customer metadata |
 
-### Shipping
+### משלוח
 
 | Method | Description |
 |--------|-------------|
@@ -203,7 +210,7 @@ These methods require WordPress username/password credentials and are independen
 | `get_shipping_zone_locations` | Get locations for a shipping zone |
 | `update_shipping_zone_locations` | Update locations for a shipping zone |
 
-### Taxes
+### מיסים
 
 | Method | Description |
 |--------|-------------|
@@ -217,7 +224,7 @@ These methods require WordPress username/password credentials and are independen
 | `delete_tax_rate` | Delete a tax rate |
 | `batch_update_tax_rates` | Batch update tax rates |
 
-### Discounts/Coupons
+### הנחות/קופונים
 
 | Method | Description |
 |--------|-------------|
@@ -228,7 +235,7 @@ These methods require WordPress username/password credentials and are independen
 | `delete_coupon` | Delete a coupon |
 | `batch_update_coupons` | Batch update coupons |
 
-### Payment Gateways
+### שערי תשלום
 
 | Method | Description |
 |--------|-------------|
@@ -236,7 +243,7 @@ These methods require WordPress username/password credentials and are independen
 | `get_payment_gateway` | Get a single payment gateway |
 | `update_payment_gateway` | Update a payment gateway |
 
-### Reports
+### דוחות
 
 | Method | Description |
 |--------|-------------|
@@ -245,7 +252,7 @@ These methods require WordPress username/password credentials and are independen
 | `get_customers_report` | Retrieve customers reports |
 | `get_stock_report` | Retrieve stock reports |
 
-### Settings
+### הגדרות
 
 | Method | Description |
 |--------|-------------|
@@ -254,7 +261,7 @@ These methods require WordPress username/password credentials and are independen
 | `update_setting_option` | Update a setting option |
 | `batch_update_settings` | Batch update settings |
 
-### System Status
+### מצב מערכת
 
 | Method | Description |
 |--------|-------------|
@@ -262,7 +269,7 @@ These methods require WordPress username/password credentials and are independen
 | `get_system_status_tools` | Retrieve system status tools |
 | `execute_system_status_tool` | Run a system status tool |
 
-### Data
+### נתונים
 
 | Method | Description |
 |--------|-------------|
@@ -272,24 +279,22 @@ These methods require WordPress username/password credentials and are independen
 | `get_currency` | Get details for a specific currency |
 | `get_current_currency` | Get the current currency |
 
-## Example Usage
+## 💻 דוגמאות שימוש
 
-### Python Examples
-
-#### Initialize the MCP Server
+### אתחול שרת MCP
 
 ```python
 import os
 from dotenv import load_dotenv
 from woocommerce_mcp import initialize
 
-# Load environment variables from .env
+# טעינת משתני סביבה מקובץ .env
 load_dotenv()
 
-# Initialize the MCP server
+# אתחול שרת MCP
 mcp = initialize()
 
-# Run the server
+# הפעלת השרת
 async def main():
     mcp.run()
 
@@ -298,14 +303,14 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-#### Get Products Example
+### דוגמה לקבלת מוצרים
 
 ```python
 import asyncio
 from woocommerce_mcp.products import get_products
 
 async def list_products():
-    # Get latest products
+    # קבלת המוצרים האחרונים
     products = await get_products({
         "per_page": 20, 
         "page": 1,
@@ -313,13 +318,13 @@ async def list_products():
     })
     
     for product in products:
-        print(f"Product: {product['name']}, Price: {product['price']}")
+        print(f"מוצר: {product['name']}, מחיר: {product['price']}")
 
-# Run the function
+# הפעלת הפונקציה
 asyncio.run(list_products())
 ```
 
-#### Create Product Example
+### דוגמה ליצירת מוצר
 
 ```python
 import asyncio
@@ -327,11 +332,11 @@ from woocommerce_mcp.products import create_product
 
 async def add_new_product():
     product_data = {
-        "name": "Premium T-Shirt",
+        "name": "חולצת פרימיום",
         "type": "simple",
-        "regular_price": "29.99",
-        "description": "Comfortable cotton t-shirt, available in various sizes.",
-        "short_description": "Premium quality t-shirt.",
+        "regular_price": "99.99",
+        "description": "חולצת כותנה נוחה, זמינה במגוון מידות וצבעים.",
+        "short_description": "חולצת פרימיום באיכות גבוהה.",
         "categories": [
             {
                 "id": 19
@@ -345,32 +350,32 @@ async def add_new_product():
     }
     
     result = await create_product(product_data)
-    print(f"Created new product with ID: {result['id']}")
+    print(f"נוצר מוצר חדש עם מזהה: {result['id']}")
 
-# Run the function
+# הפעלת הפונקציה
 asyncio.run(add_new_product())
 ```
 
-## Function Parameters
+## 📋 פרמטרים לפונקציות
 
-All functions accept their specific parameters for the API action, plus the following optional parameters:
+כל הפונקציות מקבלות את הפרמטרים הספציפיים שלהן לפעולת ה-API, בנוסף לפרמטרים האופציונליים הבאים:
 
-- `site_url`: (optional if set in env) WordPress site URL
-- `consumer_key`: (optional if set in env) WooCommerce consumer key
-- `consumer_secret`: (optional if set in env) WooCommerce consumer secret
-- For WordPress methods: `username` and `password` (optional if set in env)
+- `site_url`: (אופציונלי אם מוגדר במשתני סביבה) כתובת אתר WordPress
+- `consumer_key`: (אופציונלי אם מוגדר במשתני סביבה) מפתח צרכן WooCommerce
+- `consumer_secret`: (אופציונלי אם מוגדר במשתני סביבה) סוד צרכן WooCommerce
+- עבור שיטות WordPress: `username` ו-`password` (אופציונלי אם מוגדר במשתני סביבה)
 
-## Security Note
+## 🔒 הערת אבטחה
 
-For WooCommerce REST API access, you need to generate API keys. You can create them in your WordPress dashboard under WooCommerce → Settings → Advanced → REST API.
+לגישה ל-REST API של WooCommerce, עליך ליצור מפתחות API. ניתן ליצור אותם בלוח הבקרה של WordPress תחת WooCommerce → הגדרות → מתקדם → REST API.
 
-## Requirements
+## 📦 דרישות מערכת
 
-- Python 3.9 or higher
-- WordPress site with WooCommerce plugin installed
-- WooCommerce REST API keys
-- Python packages: `mcp-server`, `httpx`, `python-dotenv`
+- Python 3.9 ומעלה
+- אתר WordPress עם פלאגין WooCommerce מותקן
+- מפתחות REST API של WooCommerce
+- חבילות Python: `mcp-server`, `httpx`, `python-dotenv`
 
-## License
+## 📄 רישיון
 
-MIT License - See LICENSE file for details 
+MIT License - ראה קובץ LICENSE לפרטים נוספים 
