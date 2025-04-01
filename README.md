@@ -1,3 +1,5 @@
+<a name="hebrew-version"></a>
+
 <div align="center">
 
 # 🛒 WooCommerce MCP Server | Python Edition
@@ -5,8 +7,6 @@
 </div>
 
 <div dir="rtl">
-
-<a name="hebrew-version"></a>
 
 > *פתרון פשוט ויעיל לחיבור חנויות WooCommerce עם Model Context Protocol*
 
@@ -18,7 +18,7 @@
 
 </div>
 
-[Hebrew Version](#hebrew-version) | English Version
+[🇺🇸 English Version](#english-version) | <b>🇮🇱 גרסה עברית</b>
 
 ## 📌 מה זה?
 
@@ -464,7 +464,7 @@ MIT License - ראה קובץ LICENSE לפרטים נוספים
 
 </div>
 
-[Hebrew Version](#hebrew-version) | English Version
+[<b>🇮🇱 Hebrew Version</b>](#hebrew-version) | 🇺🇸 English Version
 
 ## 📌 What is it?
 
