@@ -5,12 +5,26 @@ WooCommerce MCP Server - הנקודה הראשית של השרת
 
 import os
 import sys
+import traceback
+import logging
 from dotenv import load_dotenv
 
+# הגדרת לוגר
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler()]
+)
+logger = logging.getLogger("woocommerce-mcp")
+
 # טעינת משתני סביבה מקובץ .env
+logger.info("Loading environment variables...")
 load_dotenv()
 
 from mcp.server.fastmcp import FastMCP
+import uvicorn
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 
 # קבלת פרטי התחברות מסביבת העבודה
 DEFAULT_SITE_URL = os.environ.get("WORDPRESS_SITE_URL", "")
@@ -23,11 +37,15 @@ DEFAULT_CONSUMER_SECRET = os.environ.get("WOOCOMMERCE_CONSUMER_SECRET", "")
 MCP_HOST = os.environ.get("MCP_HOST", "0.0.0.0")
 MCP_PORT = int(os.environ.get("MCP_PORT", "8000"))
 
+logger.info(f"Server configuration: HOST={MCP_HOST}, PORT={MCP_PORT}")
+
 # ייצור שרת MCP
 mcp = FastMCP("WooCommerce MCP Server")
 
 def initialize():
     """רישום כל כלי ה-MCP."""
+    logger.info("Initializing MCP tools...")
+    
     # ייבוא המודולים
     from .wordpress import register_wordpress_tools
     from .products import register_product_tools
@@ -68,22 +86,73 @@ def initialize():
     register_customer_tools(mcp)
     register_report_tools(mcp)
     
+    logger.info("All MCP tools registered successfully")
+    
+    # הוספת נקודת קצה בריאה
+    api = FastAPI()
+    
+    # הוספת CORS middleware
+    api.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    
+    @api.get("/health")
+    async def health_check():
+        logger.info("Health check endpoint called")
+        return {"status": "ok", "message": "WooCommerce MCP Server is running"}
+        
+    @api.get("/")
+    async def root():
+        logger.info("Root endpoint called")
+        return {"message": "Welcome to WooCommerce MCP Server", "docs_url": "/docs"}
+    
+    # הוספת middleware לרישום כל הבקשות
+    @api.middleware("http")
+    async def log_requests(request: Request, call_next):
+        logger.info(f"Incoming request: {request.method} {request.url.path}")
+        response = await call_next(request)
+        logger.info(f"Response status code: {response.status_code}")
+        return response
+    
+    # מיזוג ה-FastAPI שלנו עם ה-MCP
+    for route in api.routes:
+        mcp.app.routes.append(route)
+    
     return mcp
 
 def main():
     """הפונקציה הראשית המפעילה את שרת ה-MCP."""
     try:
+        logger.info(f"Starting WooCommerce MCP Server on {MCP_HOST}:{MCP_PORT}...")
+        
         # אתחול כל הכלים
         app = initialize()
         
-        # הפעלת השרת באמצעות השיטה המובנית
-        # שינוי פרמטרים דרך משתני סביבה
-        os.environ["MCP_HOST"] = MCP_HOST
-        os.environ["MCP_PORT"] = str(MCP_PORT)
-        app.run()
+        # הדפסת מידע לדיאגנוסטיקה
+        logger.info(f"Host: {MCP_HOST}")
+        logger.info(f"Port: {MCP_PORT}")
+        logger.info(f"WORDPRESS_SITE_URL: {'Set' if DEFAULT_SITE_URL else 'Not set'}")
+        logger.info(f"WOOCOMMERCE_CONSUMER_KEY: {'Set' if DEFAULT_CONSUMER_KEY else 'Not set'}")
+        logger.info(f"WOOCOMMERCE_CONSUMER_SECRET: {'Set' if DEFAULT_CONSUMER_SECRET else 'Not set'}")
+        
+        # צריך להשתמש ב-uvicorn ישירות
+        logger.info("Starting uvicorn server...")
+        uvicorn.run(
+            app.app, 
+            host=MCP_HOST, 
+            port=MCP_PORT,
+            log_level="info",
+            access_log=True
+        )
+        
     except Exception as e:
-        print(f"Error starting server: {e}", file=sys.stderr)
-        raise
+        logger.error(f"Error starting server: {e}")
+        traceback.print_exc()
+        sys.exit(1)
 
 if __name__ == "__main__":
     main() 
