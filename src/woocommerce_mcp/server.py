@@ -129,15 +129,37 @@ def initialize():
                 
             logger.info(f"Request headers: {headers_log}")
             
-            # קריאה לטיפול בבקשה
+            # קריאה לטיפול בבקשה באמצעות MCP
+            # הערה חשובה: handle_request של MCP אמור לתמוך בבקשות SSE ורגילות
+            # ולהחזיר את התשובה המתאימה לפי סוג הבקשה
+            
             response = await mcp.handle_request(request)
             logger.info(f"MCP response type: {type(response)}")
+            
+            # בדיקה אם התשובה היא EventSourceResponse (עבור SSE)
+            if isinstance(response, EventSourceResponse):
+                logger.info("Returning EventSourceResponse for SSE")
+                return response
+            
+            # בדיקה אם התשובה מכילה Content-Type: text/event-stream
+            if hasattr(response, 'headers') and response.headers.get('content-type') == 'text/event-stream':
+                logger.info("Converting response to EventSourceResponse")
+                # במקרה זה, אנחנו צריכים להמיר את התשובה ל-EventSourceResponse
+                async def event_generator():
+                    # שולחים את המידע שקיבלנו מה-MCP
+                    yield {"data": response.body.decode('utf-8')}
+                
+                return EventSourceResponse(event_generator())
+            
+            # אם זו תשובה רגילה, מחזירים אותה כמו שהיא
+            logger.info("Returning regular response")
             return response
+                
         except Exception as e:
             logger.error(f"Error in MCP endpoint: {e}")
             logger.error(f"Error details: {traceback.format_exc()}")
             # החזרת שגיאה בפורמט מתאים
-            return {"error": str(e)}, 500
+            return {"error": str(e)}
     
     # הוספת middleware לרישום כל הבקשות
     @api.middleware("http")
@@ -149,6 +171,15 @@ def initialize():
     
     # לשמור את ה-api באובייקט ה-mcp
     mcp.server = api
+    
+    # בדיקה שהשיטות הנדרשות קיימות
+    logger.info(f"MCP object methods: {dir(mcp)}")
+    logger.info(f"MCP server implementation: {mcp.server}")
+    
+    # הוספת מעטפת נוספת לנקודת הקצה של MCP
+    app_mcp_path = "/mcp"
+    logger.info(f"Setting up MCP endpoint at: {app_mcp_path}")
+    
     return mcp
 
 def main():
