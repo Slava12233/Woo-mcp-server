@@ -25,6 +25,7 @@ from mcp.server.fastmcp import FastMCP
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from sse_starlette.sse import EventSourceResponse
 
 # קבלת פרטי התחברות מסביבת העבודה
 DEFAULT_SITE_URL = os.environ.get("WORDPRESS_SITE_URL", "")
@@ -109,6 +110,14 @@ def initialize():
     async def root():
         logger.info("Root endpoint called")
         return {"message": "Welcome to WooCommerce MCP Server", "docs_url": "/docs"}
+    
+    # הוספת נקודת קצה של MCP
+    @api.get("/mcp")
+    @api.post("/mcp")
+    async def mcp_endpoint(request: Request):
+        """נקודת הקצה של פרוטוקול MCP."""
+        logger.info("MCP endpoint called")
+        return await mcp.handle_request(request)
     
     # הוספת middleware לרישום כל הבקשות
     @api.middleware("http")
