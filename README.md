@@ -41,6 +41,8 @@ pip install -r requirements.txt
 
 יש ליצור קובץ `.env` בתיקיית הבסיס של הפרויקט עם הפרטים הבאים:
 
+<div align="left" dir="ltr">
+
 ```
 WORDPRESS_SITE_URL=https://your-wordpress-site.com
 WOOCOMMERCE_CONSUMER_KEY=your-woocommerce-consumer-key
@@ -48,6 +50,8 @@ WOOCOMMERCE_CONSUMER_SECRET=your-woocommerce-consumer-secret
 WORDPRESS_USERNAME=your-wordpress-username
 WORDPRESS_PASSWORD=your-wordpress-password
 ```
+
+</div>
 
 ### משתני סביבה
 
@@ -487,6 +491,8 @@ pip install -r requirements.txt
 
 Create a `.env` file in the project root with your credentials:
 
+<div align="left" dir="ltr">
+
 ```
 WORDPRESS_SITE_URL=https://your-wordpress-site.com
 WOOCOMMERCE_CONSUMER_KEY=your-woocommerce-consumer-key
@@ -494,6 +500,8 @@ WOOCOMMERCE_CONSUMER_SECRET=your-woocommerce-consumer-secret
 WORDPRESS_USERNAME=your-wordpress-username
 WORDPRESS_PASSWORD=your-wordpress-password
 ```
+
+</div>
 
 ### Environment Variables
 
