@@ -118,6 +118,8 @@ def initialize():
         logger.info(f"Response status code: {response.status_code}")
         return response
     
+    # לשמור את ה-api באובייקט ה-mcp
+    mcp.server = api
     return mcp
 
 def main():
