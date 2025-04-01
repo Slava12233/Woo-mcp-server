@@ -88,7 +88,7 @@ def initialize():
     
     logger.info("All MCP tools registered successfully")
     
-    # הוספת נקודת קצה בריאה
+    # הגדרת FastAPI לנקודות קצה בסיסיות
     api = FastAPI()
     
     # הוספת CORS middleware
@@ -118,10 +118,6 @@ def initialize():
         logger.info(f"Response status code: {response.status_code}")
         return response
     
-    # מיזוג ה-FastAPI שלנו עם ה-MCP
-    for route in api.routes:
-        mcp.app.routes.append(route)
-    
     return mcp
 
 def main():
@@ -139,15 +135,9 @@ def main():
         logger.info(f"WOOCOMMERCE_CONSUMER_KEY: {'Set' if DEFAULT_CONSUMER_KEY else 'Not set'}")
         logger.info(f"WOOCOMMERCE_CONSUMER_SECRET: {'Set' if DEFAULT_CONSUMER_SECRET else 'Not set'}")
         
-        # צריך להשתמש ב-uvicorn ישירות
-        logger.info("Starting uvicorn server...")
-        uvicorn.run(
-            app.app, 
-            host=MCP_HOST, 
-            port=MCP_PORT,
-            log_level="info",
-            access_log=True
-        )
+        # הפעלת השרת
+        logger.info("Starting MCP server...")
+        app.start(host=MCP_HOST, port=MCP_PORT)
         
     except Exception as e:
         logger.error(f"Error starting server: {e}")
