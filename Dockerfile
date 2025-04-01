@@ -3,14 +3,11 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # התקנת כלי הבניה הנדרשים
-RUN apt-get update && apt-get install -y git build-essential
+RUN apt-get update && apt-get install -y build-essential
 
 # התקנת תלויות
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-# ניסיון להתקין MCP ישירות
-RUN pip install --no-cache-dir git+https://github.com/microsoft/mcp.git@main
 
 # העתקת קוד המקור
 COPY . .
