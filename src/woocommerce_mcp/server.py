@@ -135,9 +135,15 @@ def main():
         logger.info(f"WOOCOMMERCE_CONSUMER_KEY: {'Set' if DEFAULT_CONSUMER_KEY else 'Not set'}")
         logger.info(f"WOOCOMMERCE_CONSUMER_SECRET: {'Set' if DEFAULT_CONSUMER_SECRET else 'Not set'}")
         
-        # הפעלת השרת
-        logger.info("Starting MCP server...")
-        app.start(host=MCP_HOST, port=MCP_PORT)
+        # חזרה לשימוש ישיר ב-uvicorn
+        logger.info("Starting uvicorn server...")
+        uvicorn.run(
+            app.server, 
+            host=MCP_HOST, 
+            port=MCP_PORT,
+            log_level="info",
+            access_log=True
+        )
         
     except Exception as e:
         logger.error(f"Error starting server: {e}")
