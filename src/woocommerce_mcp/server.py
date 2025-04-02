@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 WooCommerce MCP Server - הנקודה הראשית של השרת
+Version: 1.0.1 - תיקון בעיות פריסה
 """
 
 import os
