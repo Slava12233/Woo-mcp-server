@@ -138,20 +138,20 @@ def initialize():
                 
                 # יוצרים גנרטור ששולח עדכונים
                 async def event_generator():
-                    # שולחים הודעת פתיחה
-                    yield {"event": "open", "data": "MCP server connection established"}
-                    
-                    # פה אפשר לשלוח עדכונים נוספים אם צריך
-                    yield {"event": "capabilities", "data": "tools,roots"}
-                    
-                    # לתת תיאור של הכלים הזמינים
                     import json
+                    
+                    # שולחים הודעת open - חיונית לפרוטוקול MCP
+                    yield {"event": "open", "data": json.dumps({"status": "ok"})}
+                    
+                    # שליחת אירוע capabilities - חובה לפי הפרוטוקול
+                    yield {"event": "capabilities", "data": json.dumps({"capabilities": ["tools"]})}
+                    
+                    # שליחת תיאור הכלים הזמינים
                     tools_data = {
                         "tools": [
                             {"name": "get_products", "description": "Get WooCommerce products"},
                             {"name": "get_product_categories", "description": "Get WooCommerce product categories"},
-                            {"name": "get_orders", "description": "Get WooCommerce orders"},
-                            # וכו'
+                            {"name": "get_orders", "description": "Get WooCommerce orders"}
                         ]
                     }
                     yield {"event": "tools", "data": json.dumps(tools_data)}
@@ -159,26 +159,36 @@ def initialize():
                 return EventSourceResponse(event_generator())
             else:
                 # זוהי בקשת POST רגילה למסלול MCP
-                # במקום להשתמש ב-handle_request שאינו קיים, נחזיר תיאור בסיסי של הכלים
                 logger.info("Handling regular MCP request")
                 
                 # קריאת תוכן הבקשה
                 body = await request.json() if request.method == 'POST' else {}
                 logger.info(f"Request body: {body}")
                 
-                # החזרת תשובה בסיסית
-                return {
-                    "status": "ok",
-                    "message": "MCP endpoint received request successfully",
-                    "request_type": request.method,
-                    "available_tools": ["get_products", "get_product_categories", "get_orders", "etc..."]
-                }
+                # טיפול בבקשת MCP
+                if body.get("type") == "tools_call":
+                    tool_name = body.get("tool", {}).get("name", "")
+                    tool_params = body.get("tool", {}).get("parameters", {})
+                    
+                    logger.info(f"Processing tool call: {tool_name} with params: {tool_params}")
+                    
+                    # דוגמה לתשובה - כאן תוכל להתאים לפי הכלי הנקרא
+                    return {
+                        "status": "ok",
+                        "result": f"Tool {tool_name} called successfully. This is a placeholder result."
+                    }
+                else:
+                    return {
+                        "status": "ok",
+                        "message": "MCP endpoint received request successfully",
+                        "available_tools": ["get_products", "get_product_categories", "get_orders"]
+                    }
                 
         except Exception as e:
             logger.error(f"Error in MCP endpoint: {e}")
             logger.error(f"Error details: {traceback.format_exc()}")
             # החזרת שגיאה בפורמט מתאים
-            return {"error": str(e)}
+            return {"status": "error", "error": str(e)}
     
     # הוספת middleware לרישום כל הבקשות
     @api.middleware("http")
