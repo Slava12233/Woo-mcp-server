@@ -100,6 +100,8 @@ def initialize():
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["*"],
+        max_age=3600,
     )
     
     @api.get("/health")
@@ -157,7 +159,15 @@ def initialize():
                     }
                     yield {"event": "tools", "data": json.dumps(tools_data)}
                 
-                return EventSourceResponse(event_generator())
+                # הוספת headers ספציפיים לתגובת SSE
+                return EventSourceResponse(
+                    event_generator(),
+                    ping=20000,  # שליחת ping כל 20 שניות כדי לשמור על החיבור
+                    headers={
+                        "Cache-Control": "no-cache",
+                        "Connection": "keep-alive"
+                    }
+                )
             else:
                 # זוהי בקשת POST רגילה למסלול MCP
                 logger.info("Handling regular MCP request")
