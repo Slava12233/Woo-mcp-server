@@ -479,6 +479,33 @@ asyncio.run(add_new_product())
 
 MIT License - ראה קובץ LICENSE לפרטים נוספים 
 
+## שימוש ב-MCP (Model Context Protocol)
+
+שרת זה עכשיו תומך בפרוטוקול MCP המאפשר אינטגרציה עם:
+- Claude Desktop
+- מודלים שפתיים גדולים (LLMs) אחרים
+- כלי פיתוח תומכי MCP
+
+### כדי להשתמש בשרת MCP מרחוק:
+
+1. השרת מתארח ב-Railway בכתובת:
+   ```
+   https://your-railway-app-url.railway.app
+   ```
+
+2. ניתן להתחבר אליו באחת מהדרכים הבאות:
+   - באמצעות Python Client
+   - שימוש בכלי ה-CLI של MCP
+   - אינטגרציה עם Claude Desktop
+   - שימוש בדף Web Client המצורף
+
+לפרטים מלאים על אופן השימוש, ראה את [מדריך השימוש ב-MCP](docs/MCP_GUIDE.md).
+
+### יתרונות השימוש ב-MCP:
+- אינטגרציה סטנדרטית עם כלי AI
+- גישה למשאבים, כלים ופרומפטים בצורה מאובטחת ואחידה
+- יכולת לעבוד מול שרת מרוחק בצורה סטנדרטית
+
 </div>
 
 ---
@@ -913,3 +940,30 @@ For WooCommerce REST API access, you need to generate API keys. You can create t
 ## 📄 License
 
 MIT License - See LICENSE file for details 
+
+## שימוש ב-MCP (Model Context Protocol)
+
+שרת זה עכשיו תומך בפרוטוקול MCP המאפשר אינטגרציה עם:
+- Claude Desktop
+- מודלים שפתיים גדולים (LLMs) אחרים
+- כלי פיתוח תומכי MCP
+
+### כדי להשתמש בשרת MCP מרחוק:
+
+1. השרת מתארח ב-Railway בכתובת:
+   ```
+   https://your-railway-app-url.railway.app
+   ```
+
+2. ניתן להתחבר אליו באחת מהדרכים הבאות:
+   - באמצעות Python Client
+   - שימוש בכלי ה-CLI של MCP
+   - אינטגרציה עם Claude Desktop
+   - שימוש בדף Web Client המצורף
+
+לפרטים מלאים על אופן השימוש, ראה את [מדריך השימוש ב-MCP](docs/MCP_GUIDE.md).
+
+### יתרונות השימוש ב-MCP:
+- אינטגרציה סטנדרטית עם כלי AI
+- גישה למשאבים, כלים ופרומפטים בצורה מאובטחת ואחידה
+- יכולת לעבוד מול שרת מרוחק בצורה סטנדרטית

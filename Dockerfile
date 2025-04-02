@@ -15,5 +15,9 @@ COPY . .
 # חשיפת פורט (פורט ברירת המחדל של MCP הוא 8000)
 EXPOSE 8000
 
+# הגדרת משתני סביבה
+ENV MCP_PORT=8000
+ENV MCP_HOST=0.0.0.0
+
 # הרצת השרת
 CMD ["python", "-m", "src.woocommerce_mcp.server"] 

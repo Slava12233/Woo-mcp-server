@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 WooCommerce MCP Server - הנקודה הראשית של השרת
-Version: 1.0.1 - תיקון בעיות פריסה
+Version: 1.1.0 - שדרוג לתמיכה טובה יותר ב-MCP SDK
 """
 
 import os
@@ -22,7 +22,7 @@ logger = logging.getLogger("woocommerce-mcp")
 logger.info("Loading environment variables...")
 load_dotenv()
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP, Context
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -43,6 +43,38 @@ logger.info(f"Server configuration: HOST={MCP_HOST}, PORT={MCP_PORT}")
 
 # ייצור שרת MCP
 mcp = FastMCP("WooCommerce MCP Server")
+
+# הוספת גישה ישירה לבעלי המערכת
+@mcp.resource("woo://help")
+def get_help() -> str:
+    """מדריך עזרה בסיסי למשתמשי MCP"""
+    return """## מדריך לשימוש בשרת MCP של WooCommerce
+
+שרת זה מספק גישה לפונקציונליות של WooCommerce דרך פרוטוקול MCP.
+
+### כלים זמינים:
+- מוצרים: list_products, get_product, create_product, update_product, delete_product
+- קטגוריות: list_product_categories, get_product_category, create_product_category, update_product_category
+- תגיות: list_product_tags, get_product_tag, create_product_tag, update_product_tag
+- הזמנות: list_orders, get_order, update_order, create_order
+- לקוחות: list_customers, get_customer, create_customer, update_customer
+- הנחות: list_coupons, get_coupon, create_coupon, update_coupon, delete_coupon
+- נתונים: get_reports, get_sales, get_top_sellers
+"""
+
+# הוספת פרומפטים פופולריים
+@mcp.prompt()
+def product_search(search_term: str) -> str:
+    """חיפוש מוצרים"""
+    return f"""עזור לי למצוא מוצרים שקשורים ל-"{search_term}". 
+אתה יכול להשתמש בכלי list_products כדי לקבל את כל המוצרים ואז לסנן לפי הקריטריונים."""
+
+@mcp.prompt()
+def order_analysis() -> str:
+    """ניתוח הזמנות"""
+    return """אנא עזור לי לנתח את ההזמנות האחרונות. 
+השתמש בכלי list_orders כדי לקבל את ההזמנות ואז תן לי סיכום של המצב הנוכחי,
+כמה הזמנות בסטטוס processing, כמה completed, וכמה pending."""
 
 def initialize():
     """רישום כל כלי ה-MCP."""
@@ -90,7 +122,7 @@ def initialize():
     
     logger.info("All MCP tools registered successfully")
     
-    # הגדרת FastAPI לנקודות קצה בסיסיות
+    # יצירת אפליקציית FastAPI שמשלבת את ה-MCP ונקודות קצה נוספות
     api = FastAPI()
     
     # הוספת CORS middleware
@@ -114,92 +146,15 @@ def initialize():
         logger.info("Root endpoint called")
         return {"message": "Welcome to WooCommerce MCP Server", "docs_url": "/docs"}
     
-    # הוספת נקודת קצה של MCP
-    @api.get("/mcp")
-    @api.post("/mcp")
-    async def mcp_endpoint(request: Request):
-        """נקודת הקצה של פרוטוקול MCP."""
-        logger.info(f"MCP endpoint called with method: {request.method}")
-        
-        try:
-            # לוג של headers כדי לראות מה נשלח
-            headers_log = dict(request.headers)
-            # הסרת פרטים רגישים מהלוג
-            if 'authorization' in headers_log:
-                headers_log['authorization'] = '[REDACTED]'
-            if 'cookie' in headers_log:
-                headers_log['cookie'] = '[REDACTED]'
-                
-            logger.info(f"Request headers: {headers_log}")
-            
-            # בדיקה אם זו בקשת SSE (בקשת GET עם header מתאים)
-            accept_header = request.headers.get('accept', '')
-            is_sse_request = request.method == 'GET' and 'text/event-stream' in accept_header
-            
-            if is_sse_request:
-                logger.info("Handling SSE request")
-                
-                # יוצרים גנרטור ששולח עדכונים
-                async def event_generator():
-                    import json
-                    
-                    # שולחים הודעת open - חיונית לפרוטוקול MCP
-                    yield {"event": "open", "data": json.dumps({"status": "ok"})}
-                    
-                    # שליחת אירוע capabilities - חובה לפי הפרוטוקול
-                    yield {"event": "capabilities", "data": json.dumps({"capabilities": ["tools"]})}
-                    
-                    # שליחת תיאור הכלים הזמינים
-                    tools_data = {
-                        "tools": [
-                            {"name": "get_products", "description": "Get WooCommerce products"},
-                            {"name": "get_product_categories", "description": "Get WooCommerce product categories"},
-                            {"name": "get_orders", "description": "Get WooCommerce orders"}
-                        ]
-                    }
-                    yield {"event": "tools", "data": json.dumps(tools_data)}
-                
-                # הוספת headers ספציפיים לתגובת SSE
-                return EventSourceResponse(
-                    event_generator(),
-                    ping=20000,  # שליחת ping כל 20 שניות כדי לשמור על החיבור
-                    headers={
-                        "Cache-Control": "no-cache",
-                        "Connection": "keep-alive"
-                    }
-                )
-            else:
-                # זוהי בקשת POST רגילה למסלול MCP
-                logger.info("Handling regular MCP request")
-                
-                # קריאת תוכן הבקשה
-                body = await request.json() if request.method == 'POST' else {}
-                logger.info(f"Request body: {body}")
-                
-                # טיפול בבקשת MCP
-                if body.get("type") == "tools_call":
-                    tool_name = body.get("tool", {}).get("name", "")
-                    tool_params = body.get("tool", {}).get("parameters", {})
-                    
-                    logger.info(f"Processing tool call: {tool_name} with params: {tool_params}")
-                    
-                    # דוגמה לתשובה - כאן תוכל להתאים לפי הכלי הנקרא
-                    return {
-                        "status": "ok",
-                        "result": f"Tool {tool_name} called successfully. This is a placeholder result."
-                    }
-                else:
-                    return {
-                        "status": "ok",
-                        "message": "MCP endpoint received request successfully",
-                        "available_tools": ["get_products", "get_product_categories", "get_orders"]
-                    }
-                
-        except Exception as e:
-            logger.error(f"Error in MCP endpoint: {e}")
-            logger.error(f"Error details: {traceback.format_exc()}")
-            # החזרת שגיאה בפורמט מתאים
-            return {"status": "error", "error": str(e)}
+    # שילוב אפליקציית ה-MCP באמצעות mount
+    from fastapi.routing import Mount
+    
+    # יצירת ה-SSE app של MCP
+    mcp_app = mcp.sse_app()
+    
+    # הוספת ה-mount ל-api הראשי
+    api.routes.append(Mount("/mcp", app=mcp_app))
+    logger.info("MCP SSE endpoint mounted at /mcp")
     
     # הוספת middleware לרישום כל הבקשות
     @api.middleware("http")
@@ -209,18 +164,9 @@ def initialize():
         logger.info(f"Response status code: {response.status_code}")
         return response
     
-    # לשמור את ה-api באובייקט ה-mcp
-    mcp.server = api
+    logger.info(f"FastAPI app created with MCP integration")
     
-    # בדיקה שהשיטות הנדרשות קיימות
-    logger.info(f"MCP object methods: {dir(mcp)}")
-    logger.info(f"MCP server implementation: {mcp.server}")
-    
-    # הוספת מעטפת נוספת לנקודת הקצה של MCP
-    app_mcp_path = "/mcp"
-    logger.info(f"Setting up MCP endpoint at: {app_mcp_path}")
-    
-    return mcp
+    return api
 
 def main():
     """הפונקציה הראשית המפעילה את שרת ה-MCP."""
@@ -240,7 +186,7 @@ def main():
         # חזרה לשימוש ישיר ב-uvicorn
         logger.info("Starting uvicorn server...")
         uvicorn.run(
-            app.server, 
+            app, 
             host=MCP_HOST, 
             port=MCP_PORT,
             log_level="info",
