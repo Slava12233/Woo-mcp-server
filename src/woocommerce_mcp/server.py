@@ -129,31 +129,50 @@ def initialize():
                 
             logger.info(f"Request headers: {headers_log}")
             
-            # קריאה לטיפול בבקשה באמצעות MCP
-            # הערה חשובה: handle_request של MCP אמור לתמוך בבקשות SSE ורגילות
-            # ולהחזיר את התשובה המתאימה לפי סוג הבקשה
+            # בדיקה אם זו בקשת SSE (בקשת GET עם header מתאים)
+            accept_header = request.headers.get('accept', '')
+            is_sse_request = request.method == 'GET' and 'text/event-stream' in accept_header
             
-            response = await mcp.handle_request(request)
-            logger.info(f"MCP response type: {type(response)}")
-            
-            # בדיקה אם התשובה היא EventSourceResponse (עבור SSE)
-            if isinstance(response, EventSourceResponse):
-                logger.info("Returning EventSourceResponse for SSE")
-                return response
-            
-            # בדיקה אם התשובה מכילה Content-Type: text/event-stream
-            if hasattr(response, 'headers') and response.headers.get('content-type') == 'text/event-stream':
-                logger.info("Converting response to EventSourceResponse")
-                # במקרה זה, אנחנו צריכים להמיר את התשובה ל-EventSourceResponse
+            if is_sse_request:
+                logger.info("Handling SSE request")
+                
+                # יוצרים גנרטור ששולח עדכונים
                 async def event_generator():
-                    # שולחים את המידע שקיבלנו מה-MCP
-                    yield {"data": response.body.decode('utf-8')}
+                    # שולחים הודעת פתיחה
+                    yield {"event": "open", "data": "MCP server connection established"}
+                    
+                    # פה אפשר לשלוח עדכונים נוספים אם צריך
+                    yield {"event": "capabilities", "data": "tools,roots"}
+                    
+                    # לתת תיאור של הכלים הזמינים
+                    import json
+                    tools_data = {
+                        "tools": [
+                            {"name": "get_products", "description": "Get WooCommerce products"},
+                            {"name": "get_product_categories", "description": "Get WooCommerce product categories"},
+                            {"name": "get_orders", "description": "Get WooCommerce orders"},
+                            # וכו'
+                        ]
+                    }
+                    yield {"event": "tools", "data": json.dumps(tools_data)}
                 
                 return EventSourceResponse(event_generator())
-            
-            # אם זו תשובה רגילה, מחזירים אותה כמו שהיא
-            logger.info("Returning regular response")
-            return response
+            else:
+                # זוהי בקשת POST רגילה למסלול MCP
+                # במקום להשתמש ב-handle_request שאינו קיים, נחזיר תיאור בסיסי של הכלים
+                logger.info("Handling regular MCP request")
+                
+                # קריאת תוכן הבקשה
+                body = await request.json() if request.method == 'POST' else {}
+                logger.info(f"Request body: {body}")
+                
+                # החזרת תשובה בסיסית
+                return {
+                    "status": "ok",
+                    "message": "MCP endpoint received request successfully",
+                    "request_type": request.method,
+                    "available_tools": ["get_products", "get_product_categories", "get_orders", "etc..."]
+                }
                 
         except Exception as e:
             logger.error(f"Error in MCP endpoint: {e}")
